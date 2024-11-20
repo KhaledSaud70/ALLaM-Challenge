@@ -10,10 +10,6 @@ class QueryTransformPrompt(PromptTemplate):
 
 @PromptTemplateRegistry.register("PoemGenerator")
 class PoemGeneratorPrompt(PromptTemplate):
-    #     template: str = """\
-    # Input: اكتب قصيدة {theme} تتألف من {num_verses}، على وزن بحر {meter} وبقافية بحرف الروى {rhyme}.
-    # Output:
-    #     """
     template: str = """Input:
 العصر: {era}
 البحر: {meter}
@@ -51,32 +47,6 @@ Output:
 
 @PromptTemplateRegistry.register("VerseReviewer")
 class VerseReviewerPrompt(PromptTemplate):
-    #     template: str = """سجل المحادثة:
-    # ---
-    # {conversation_history}
-    # ---
-
-    # المحاولة رقم: {current_iteration} من أصل {iteration_limit}
-
-    # ### آلية المراجعة:
-    # 1. يجب دائماً تضمين البيت بعد التصحيح في الحقول first_hemistich و second_hemistich.
-    # 2. إذا كان البيت يحتاج إلى تعديل ولم تستنفد المحاولات:
-    #    - أضف حقل feedback يتضمن:
-    #      * تحديد المشكلة (الوزن، القافية، أو المعنى)
-    #      * مثال مرجعي محسّن يعالج جميع الجوانب دفعة واحدة (الوزن، القافية، والمعنى)
-    #      * شرح التعديلات المطلوبة بدقة
-
-    # 3. إذا كان البيت سليماً أو استنفدت المحاولات:
-    #    - اترك حقل feedback فارغاً
-    #    - تأكد من أن first_hemistich و second_hemistich يحتويان على البيت بعد التصحيح
-
-    # ### التنسيق المطلوب:
-    # {{
-    #     "first_hemistich": "الشطر الأول من البيت بعد التصحيح",
-    #     "second_hemistich": "الشطر الثاني من البيت بعد التصحيح",
-    #     "feedback": "التعليمات والمثال المرجعي (فقط إذا كان التعديل مطلوباً ولم تستنفد المحاولات)"
-    # }}
-    # """
     template: str = """سجل المحادثة:
 ---
 {conversation_history}
