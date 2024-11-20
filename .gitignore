@@ -1,0 +1,7 @@
+.env
+__pycache__/
+.vscode
+models/weights
+data/
+myenv/
+*.log
