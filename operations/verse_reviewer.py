@@ -70,7 +70,6 @@ class VerseReview(BaseModel):
 
 
 class VerseReviewer(Operation[VerseAnalysisState]):
-    llm_name: str = "claude-3-5-sonnet-latest"
     system_prompt: str = SYSTEM_PROMPT
 
     def get_messages(self, state: VerseAnalysisState) -> List[BaseMessage]:
@@ -109,24 +108,15 @@ class VerseReviewer(Operation[VerseAnalysisState]):
         messages = HumanMessage(content=prompt)
         return messages
 
-    def _get_llm(self) -> Any:
-        llm = ChatAnthropic(
-            model=self.llm_name,
-            temperature=0.3,
-            max_tokens=1000,
-            top_p=0.9,
-            timeout=None,
-            max_retries=2,
-        )
-        return llm.with_structured_output(VerseReview)
-
     async def ainvoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
+        llm = llm.with_structured_output(VerseReview)
         response = await llm.ainvoke(messages)
         return response
 
     def invoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
+        llm = llm.with_structured_output(VerseReview)
         response = llm.invoke(messages)
         return response
 

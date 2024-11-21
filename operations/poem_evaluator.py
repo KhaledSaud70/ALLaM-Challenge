@@ -56,7 +56,6 @@ class PoemResult(BaseModel):
 
 
 class PoemEvaluator(Operation[AgentState]):
-    llm_name: str = "claude-3-5-sonnet-latest"
     system_prompt: str = SYSTEM_PROMPT
 
     def get_messages(self, state: AgentState) -> List[BaseMessage]:
@@ -110,24 +109,16 @@ class PoemEvaluator(Operation[AgentState]):
 
         return prompt
 
-    def _get_llm(self) -> Any:
-        llm = ChatAnthropic(
-            model=self.llm_name,
-            temperature=0,
-            max_tokens=500,
-            timeout=None,
-            max_retries=2,
-        )
-        return llm.with_structured_output(PoemResult)
-
     async def ainvoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
+        llm = llm.with_structured_output(PoemResult)
         response = await llm.ainvoke(messages)
         return response
 
     def invoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
-        response = llm.invoke(messages)
+        llm = llm.with_structured_output(PoemResult)
+        response = llm.ainvoke(messages)
         return response
 
     def process_response(self, response: str, state: AgentState) -> Dict[str, Any]:

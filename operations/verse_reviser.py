@@ -22,14 +22,7 @@ SYSTEM_PROMPT = """قم بتصحيح الأبيات الشعرية العربي�
 
 
 class VerseReviser(Operation[VerseAnalysisState]):
-    llm_name: str = "allam-13b"
     system_prompt: str = SYSTEM_PROMPT
-    llm_parameters: Dict[str, Any] = {
-        "temperature": 0.3,
-        "top_p": 0.85,
-        "top_k": 40,
-        "max_new_tokens": 200,
-    }
 
     def get_messages(self, state: VerseAnalysisState) -> List[BaseMessage]:
         prompt_template = PromptTemplateRegistry.get("VerseReviser")
@@ -46,10 +39,6 @@ class VerseReviser(Operation[VerseAnalysisState]):
 
         messages = HumanMessage(content=prompt)
         return messages
-
-    def _get_llm(self) -> Any:
-        # fake_messages = ["This is the VerseReviser agent"]
-        return self.llm_registry.get(self.llm_name, parameters=self.llm_parameters)
 
     async def ainvoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()

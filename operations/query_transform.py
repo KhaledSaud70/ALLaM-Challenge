@@ -50,7 +50,6 @@ class ThemeValidator(BaseModel):
 
 
 class QueryTransform(Operation[AgentState]):
-    llm_name: str = "gpt-4o"
     system_prompt: str = SYSTEM_PROMPT
 
     def get_messages(self, state: AgentState) -> List[BaseMessage]:
@@ -59,23 +58,15 @@ class QueryTransform(Operation[AgentState]):
         messages = HumanMessage(content=prompt)
         return messages
 
-    def _get_llm(self) -> Any:
-        llm = ChatOpenAI(
-            model=self.llm_name,
-            temperature=0,
-            max_tokens=200,
-            timeout=None,
-            max_retries=2,
-        )
-        return llm.with_structured_output(ThemeValidator)
-
     async def ainvoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
+        llm = llm.with_structured_output(ThemeValidator)
         response = await llm.ainvoke(messages)
         return response
 
     def invoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
+        llm = llm.with_structured_output(ThemeValidator)
         response = llm.invoke(messages)
         return response
 

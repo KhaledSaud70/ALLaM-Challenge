@@ -62,16 +62,7 @@ verse_mapping = {
 
 
 class PoemGenerator(Operation[AgentState]):
-    llm_name: str = "allam-13b"
     system_prompt: str = SYSTEM_PROMPT
-    llm_parameters: Dict[str, Any] = {
-        "temperature": 0.5,
-        "top_p": 0.85,  # lower to maintain more focused word selection
-        "repetition_penalty": 1.1,  # to prevent repetitive phrases
-        "presence_penalty": 0.1,  # to encourage diverse vocabulary
-        "max_new_tokens": 500,
-        "stop_sequences": ["[نهاية_القصيدة]"],
-    }
 
     def get_messages(self, state: AgentState) -> List[BaseMessage]:
         data = state["user_preferences"]
@@ -100,9 +91,6 @@ class PoemGenerator(Operation[AgentState]):
         reference_poems = "\n".join(poem["llm_prompt"] for poem in reference_poems_list)
         return self.system_prompt.format(reference_poems=reference_poems)
 
-    def _get_llm(self) -> Any:
-        return self.llm_registry.get(self.llm_name, parameters=self.llm_parameters)
-
     async def ainvoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
         response = await llm.ainvoke(messages)
@@ -111,8 +99,8 @@ class PoemGenerator(Operation[AgentState]):
     def invoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
         response = llm.invoke(messages)
-        print_operation_output(output=response.content, operation="PoemGenerator")
         return response
 
     def process_response(self, response: str, state: AgentState) -> Dict[str, Any]:
+        print_operation_output(output=response.content, operation="PoemGenerator")
         return {"poems": [response.content]}

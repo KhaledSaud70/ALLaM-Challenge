@@ -10,7 +10,9 @@ AgentState = TypeVar("AgentState", bound=BaseModel)
 
 
 class Operation(ABC, BaseModel, Generic[AgentState]):
-    llm_name: str = Field(default="FakeListChatModel")
+    llm_provider: str = Field(default="custom")
+    llm_name: str = Field(default="FakeChatModel")
+    llm_params: dict = Field(default_factory=dict)
     llm_registry: LLMRegistry = Field(default_factory=LLMRegistry)
     system_prompt: str
 
@@ -43,6 +45,9 @@ class Operation(ABC, BaseModel, Generic[AgentState]):
         """Optional method to format system prompt with state variables.
         Can be overridden by child classes if they need custom formatting."""
         return self.system_prompt
+    
+    def _get_llm(self) -> Any:
+        return self.llm_registry.get(llm_provider=self.llm_provider, model_name=self.llm_name, **self.llm_params)
 
     @abstractmethod
     def get_messages(self, state: AgentState) -> List[BaseMessage]:
