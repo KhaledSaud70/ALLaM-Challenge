@@ -25,7 +25,7 @@ class ModelConfig:
     learning_rate: float = 5e-05
 
 
-class MeterModel:
+class MeterClassifier:
     """Arabic poetry meter model using AraPoemBERT."""
 
     # Class-level constants
@@ -134,8 +134,7 @@ class MeterModel:
         }
 
 
-@LLMRegistry.register("meter_model")
-def get_meter_model(config: Dict[str, Any] = None) -> MeterModel:
+@LLMRegistry.register("meter_classifier")
+def get_meter_model() -> MeterClassifier:
     """Factory function for class registry integration."""
-    model_config = ModelConfig(**config) if config else ModelConfig()
-    return MeterModel(model_config)
+    return MeterClassifier(ModelConfig())

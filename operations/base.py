@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Generic, List, TypeVar
 
@@ -47,6 +48,47 @@ class Operation(ABC, BaseModel, Generic[AgentState]):
         return self.system_prompt
     
     def _get_llm(self) -> Any:
+        # Validate custom model usage
+        if self.llm_provider == "custom":
+            if self.llm_name not in ["allam-13b", "FakeChatModel"]:
+                raise ValueError(f"Invalid custom model name: {self.llm_name}")
+
+            # Operations that require structured output
+            structured_output_ops = [
+                "QueryTransform", 
+                "PoemEvaluator", 
+                "VerseReviewer"
+            ]
+
+            # Reject allam-13b for operations requiring structured output
+            if self.llm_name == "allam-13b" and type(self).__name__ in structured_output_ops:
+                raise ValueError(f"allam-13b cannot be used for {type(self).__name__} as it does not support structured output")
+
+            # For FakeChatModel in operations requiring structured output, 
+            # prepare appropriate fake responses
+            if self.llm_name == "FakeChatModel":
+                fake_responses = {
+                    "QueryTransform": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
+                        "is_valid": True,
+                        "transformed_theme": "Fake theme for debugging",
+                        "error": None
+                    })]),
+                    "PoemGenerator": lambda: self.llm_registry.get(llm_provider="custom", messages=["Fake response"]),
+                    "PoemEvaluator": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
+                        "best_poem": "Fake poem for debugging"
+                    })]),
+                    "VerseReviewer": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
+                        "first_hemistich": "Fake first hemistich",
+                        "second_hemistich": "Fake second hemistich",
+                        "feedback": None,
+                    })]),
+                    "VerseReviser": lambda: self.llm_registry.get(llm_provider="custom", messages=["Fake response"]),
+                }
+
+                if type(self).__name__ in fake_responses:
+                    return fake_responses[type(self).__name__]()
+
+        # Default LLM retrieval
         return self.llm_registry.get(llm_provider=self.llm_provider, model_name=self.llm_name, **self.llm_params)
 
     @abstractmethod

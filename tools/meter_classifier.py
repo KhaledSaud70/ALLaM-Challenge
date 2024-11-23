@@ -5,8 +5,8 @@ from .utils import print_tool_output
 
 
 class MeterClassifier:
-    def __init__(self, config: Dict[str, Any] = None, weights_path: str = None):
-        self.model = LLMRegistry().get(model_name="meter_model", config=config)
+    def __init__(self, weights_path: str = None):
+        self.model = LLMRegistry().get(llm_provider="custom", model_name="meter_classifier")
         self.model.load_weights(weights_path=weights_path)
 
     def __call__(self, state: VerseAnalysisState) -> Dict[str, Any]:

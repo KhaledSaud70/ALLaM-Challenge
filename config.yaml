@@ -1,0 +1,58 @@
+task:
+  user_preferences:
+    poet_name: ""
+    meter: "الطويل"
+    rhyme: "ي"
+    era: "العصر العثماني"
+    theme: "الشوق"
+    num_verses: 4
+  num_reference_poems: 3 # Number of reference poems to retrieve
+  num_poems_to_evaluate: 5 # Number of poems to generate for evaluation.
+  reference_poems: [] # Keep it empty
+  error: {} # Keep it empty
+
+model_paths:
+  meter_weights_path: "models/weights/meter_model_weights.pt"
+  diacritizer_weights_path: "models/weights/diacritizer_model_weights.pt"
+
+operations:
+  poem_generator:
+    provider: "anthropic"
+    name: "claude-3-5-sonnet-latest"
+    params:
+      temperature: 0.7
+      top_p: 0.85
+      max_tokens: 500
+      stop_sequences: ["[نهاية_القصيدة]"]
+
+  poem_evaluator:
+    provider: "anthropic"
+    name: "claude-3-5-sonnet-latest"
+    params:
+      temperature: 0.0
+      max_tokens: 500
+
+  query_transform:
+    provider: "openai"
+    name: "gpt-4o"
+    params:
+      temperature: 0.0
+      max_tokens: 200
+
+  verse_reviewer:
+    provider: "anthropic"
+    name: "claude-3-5-sonnet-latest"
+    params:
+      temperature: 0.3
+      top_p: 0.9
+      max_tokens: 1000
+
+  verse_reviser:
+    provider: "anthropic"
+    name: "claude-3-5-sonnet-latest"
+    params:
+      temperature: 0.3
+      top_p: 0.85
+      max_tokens: 200
+
+db_path: "data/arabic_poems.db"

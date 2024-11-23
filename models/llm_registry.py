@@ -33,7 +33,7 @@ class LLMRegistry:
         """
         if llm_provider == "custom":
             # Handle custom registered models (ALLaM and FakeChatModel)
-            llm_class = cls.registry.get(model_name)
+            llm_class = cls.registry.get(model_name, **kwargs)
             if llm_class is None:
                 raise ValueError(f"Custom LLM '{model_name}' not found in registry.")
             return llm_class(**kwargs)

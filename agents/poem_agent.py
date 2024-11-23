@@ -10,17 +10,44 @@ from states import AgentState
 from tools import PoemRetrieval
 
 from .verse_analysis import VerseAnalysis
+from config import Config
 
 
 class PoemGeneratorAgent:
-    def __init__(self, models_configs: dict, db_path: str, memory=MemorySaver()):
-        self.models_configs = models_configs
-        self.memory = memory
-        self.poem_retrieval = PoemRetrieval(db_path=db_path if db_path else "data/arabic_poems.db")
-        self.query_transform = QueryTransform()
-        self.poem_generator = PoemGenerator()
-        self.poem_evaluator = PoemEvaluator()
-        self.verse_analysis = VerseAnalysis(models_configs=models_configs, as_subgraph=True)
+    def __init__(self, config: Config, memory=None):
+        self.config = config
+        self.memory = memory or MemorySaver()
+        
+        # Initialize components with configuration
+        self.poem_retrieval = PoemRetrieval(
+            db_path=str(config.db_path),
+            diacritizer_weights_path=str(config.model_paths.diacritizer_weights_path)
+        )
+        
+        self.query_transform = QueryTransform(
+            provider=config.operations.query_transform.provider,
+            llm_name=config.operations.query_transform.name,
+            llm_params=config.operations.query_transform.params
+        )
+        
+        self.poem_generator = PoemGenerator(
+            provider=config.operations.poem_generator.provider,
+            llm_name=config.operations.poem_generator.name,
+            llm_params=config.operations.poem_generator.params
+        )
+        
+        self.poem_evaluator = PoemEvaluator(
+            provider=config.operations.poem_evaluator.provider,
+            llm_name=config.operations.poem_evaluator.name,
+            llm_params=config.operations.poem_evaluator.params
+        )
+        
+        self.verse_analysis = VerseAnalysis(
+            config=config,
+            memory=self.memory,
+            as_subgraph=True
+        )
+        
         self._graph = self._create_workflow()
 
     def _create_workflow(self) -> StateGraph:
@@ -90,50 +117,21 @@ class PoemGeneratorAgent:
             for id, v in enumerate(state["selected_poem"])
         ]
 
-    async def aexecute(self, inputs: Dict[str, str], thread_id: int = None) -> Dict[str, Any]:
+    async def aexecute(self, thread_id: int = None) -> Dict[str, Any]:
         workflow = self._graph.compile()
 
-        config = {"configurable": {"thread_id": thread_id}}  # "thread_ts": datetime.now(timezone.utc)
-        response = await workflow.ainvoke(inputs, config=config)
+        config = {"configurable": {"thread_id": thread_id}}
+        response = await workflow.ainvoke(self.config.task, config=config)
 
         return response
 
-    def execute(self, inputs: Dict[str, str], thread_id: int = None) -> Dict[str, Any]:
+    def execute(self, thread_id: int = None) -> Dict[str, Any]:
         workflow = self._graph.compile(debug=False)
 
-        config = {"configurable": {"thread_id": thread_id}}  # "thread_ts": datetime.now(timezone.utc)
-        response = workflow.invoke(inputs, config=config)
+        config = {"configurable": {"thread_id": thread_id}}
+        response = workflow.invoke(self.config.task, config=config)
 
         return response
 
     def get_graph(self):
         return self._create_workflow()
-
-
-if __name__ == "__main__":
-    inputs1 = {
-        "user_preferences": {
-            "poet_name": "",
-            "meter": "الخفيف",
-            "rhyme": "د",
-            "era": "العصر المملوكي",
-            "theme": "",
-            "num_verses": 4,
-        },
-        "num_reference_poems": 3,
-        "num_poems_to_evaluate": 3,
-        "reference_poems": "",
-        "error": {},
-    }
-
-    models_configs = {
-        "meter_weights_path": "models/weights/classic_meters_classifierTF_10L12H.h5",
-        "diacritizer_weights_path": "models/weights/diacritizer_model_weights.pt",
-    }
-
-    agent = PoemGeneratorAgent(models_configs=models_configs)
-    response = agent.execute(inputs1, thread_id=str(uuid.uuid4()))
-
-    print("FINAL STATE:\n")
-    for k, v in response.items():
-        print(f"{k}: {v}")

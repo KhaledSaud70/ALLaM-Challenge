@@ -117,8 +117,9 @@ class PoemEvaluator(Operation[AgentState]):
 
     def invoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
-        llm = llm.with_structured_output(PoemResult)
-        response = llm.ainvoke(messages)
+        if self.llm_provider != "custom":
+            llm = llm.with_structured_output(PoemResult)
+        response = llm.invoke(messages)
         return response
 
     def process_response(self, response: str, state: AgentState) -> Dict[str, Any]:

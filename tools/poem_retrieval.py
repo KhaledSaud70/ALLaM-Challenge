@@ -33,8 +33,9 @@ verse_mapping = {
 
 
 class PoemRetrieval:
-    def __init__(self, db_path: str = "data/arabic_poems.db"):
+    def __init__(self, db_path: str, diacritizer_weights_path):
         self.db_path = db_path
+        self.diacritizer_weights_path = diacritizer_weights_path
         self.MAX_REFERENCE_POEMS = 20
 
     def search_poems(self, state: AgentState) -> List[Dict]:
@@ -180,9 +181,7 @@ class PoemRetrieval:
 
     def _format_poem(self, row: Dict) -> Dict:
         """Format a poem for LLM prompt generation with diacritization"""
-        diacritizer = Diacritizer(
-            weights_path="/home/khaled/workspace/projects/allam/models/weights/diacritizer_model_weights.pt"
-        )
+        diacritizer = Diacritizer(weights_path=self.diacritizer_weights_path)
 
         first_hemistiches = row["first_hemistiches"].split("|")
         second_hemistiches = row["second_hemistiches"].split("|")

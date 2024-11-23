@@ -53,9 +53,3 @@ class VerseReviser(Operation[VerseAnalysisState]):
     def process_response(self, response: str, state: VerseAnalysisState) -> Dict[str, Any]:
         print_operation_output(output=f"ID: {state.get('verse_id')}\n" + response.content, operation="VerseReviser")
         return {"reviser_feedback": response.content}
-
-
-if __name__ == "__main__":
-    agent = VerseReviser()
-    input = {}
-    agent.execute(input)

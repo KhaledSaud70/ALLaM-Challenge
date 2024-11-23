@@ -12,6 +12,7 @@ from states import VerseAnalysisState
 from tools import Diacritizer, MeterClassifier, MeterRegistry, ProsodyWriter, RhymeClassifier
 
 from .utils import print_output
+from config import Config
 
 
 @dataclass
@@ -95,16 +96,35 @@ class VerseProsodyForm:
 
 
 class VerseAnalysis:
-    def __init__(self, models_configs: dict, memory: Optional[MemorySaver] = None, as_subgraph: bool = False):
-        self.models_configs = models_configs
+    def __init__(self, config: Config, memory: Optional[MemorySaver] = None, as_subgraph = False):
+        self.config = config
         self.memory = memory
         self.as_subgraph = as_subgraph
-        self.meter_classifier = MeterClassifier(weights_path=models_configs["meter_weights_path"])
+        
+        # Initialize components with configuration
+        self.meter_classifier = MeterClassifier(
+            weights_path=str(config.model_paths.meter_weights_path)
+        )
+        
         self.rhyme_classifier = RhymeClassifier()
         self.prosody_writer = ProsodyWriter()
-        self.diacritizer = Diacritizer(weights_path=models_configs["diacritizer_weights_path"])
-        self.verse_reviewer = VerseReviewer()
-        self.verse_reviser = VerseReviser()
+        
+        self.diacritizer = Diacritizer(
+            weights_path=str(config.model_paths.diacritizer_weights_path)
+        )
+        
+        self.verse_reviewer = VerseReviewer(
+            provider=config.operations.verse_reviewer.provider,
+            llm_name=config.operations.verse_reviewer.name,
+            llm_params=config.operations.verse_reviewer.params
+        )
+        
+        self.verse_reviser = VerseReviser(
+            provider=config.operations.verse_reviser.provider,
+            llm_name=config.operations.verse_reviser.name,
+            llm_params=config.operations.verse_reviser.params
+        )
+        
         self._graph = self._create_workflow()
 
     def _create_workflow(self) -> StateGraph:
