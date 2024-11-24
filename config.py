@@ -37,6 +37,7 @@ class OperationConfig:
 
 @dataclass
 class Config:
+    task: dict
     model_paths: ModelPaths
     operations: OperationConfig
     db_path: Optional[Path] = None

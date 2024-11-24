@@ -109,7 +109,8 @@ class PoemEvaluator(Operation[AgentState]):
 
     async def ainvoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
-        llm = llm.with_structured_output(PoemResult)
+        if self.llm_provider != "custom":
+            llm = llm.with_structured_output(PoemResult)
         response = await llm.ainvoke(messages)
         return response
 
@@ -121,5 +122,8 @@ class PoemEvaluator(Operation[AgentState]):
         return response
 
     def process_response(self, response: str, state: AgentState) -> Dict[str, Any]:
-        print_operation_output(output=response.best_poem, operation="PoemEvaluator")
-        return {"selected_poem": response.best_poem}
+        if self.llm_provider == "custom" and self.llm_name == "FakeChatModel":
+            response = json.loads(response.content)
+        
+        print_operation_output(output=response.get("best_poem", {}), operation="PoemEvaluator")
+        return {"selected_poem": response.get("best_poem", {})}

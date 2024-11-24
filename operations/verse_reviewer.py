@@ -83,7 +83,7 @@ class VerseReviewer(Operation[VerseAnalysisState]):
 """
         reference_poem_lines = []
         for verse in state["reference_poem"]:
-            formatted_verse = f"{verse.first_hemistich} | {verse.second_hemistich}"
+            formatted_verse = f"{verse.get('first_hemistich')} | {verse.get('second_hemistich')}"
             # formatted_verse = f"{verse['first_hemistich']} | {verse['second_hemistich']}"
             reference_poem_lines.append(formatted_verse)
 
@@ -108,18 +108,30 @@ class VerseReviewer(Operation[VerseAnalysisState]):
 
     async def ainvoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
-        llm = llm.with_structured_output(VerseReview)
+        if self.llm_provider != "custom":
+            llm = llm.with_structured_output(VerseReview)
         response = await llm.ainvoke(messages)
         return response
 
     def invoke(self, messages: List[BaseMessage]) -> BaseMessage:
         llm = self._get_llm()
-        llm = llm.with_structured_output(VerseReview)
+        if self.llm_provider != "custom":
+            llm = llm.with_structured_output(VerseReview)
         response = llm.invoke(messages)
         return response
 
     def process_response(self, response: VerseReview, state: VerseAnalysisState) -> Dict[str, Any]:
         """Process the structured response from the reviewer"""
+        if self.llm_provider == "custom" and self.llm_name == "FakeChatModel":
+            response_data = json.loads(response.content)
+            print_operation_output(output=response_data, operation="VerseReviewer")
+            return {
+                "reviewer_feedback": response_data.get("feedback"),
+                "last_best_verse": response_data.get("feedback"),
+                "is_approved": False,
+                "current_recursion": state["current_recursion"] + 1,
+            }
+        
         response_data = response.model_dump()
 
         feedback_text = response_data.pop("feedback", "") or ""  
@@ -133,12 +145,12 @@ class VerseReviewer(Operation[VerseAnalysisState]):
 
         # Always return the hemistiches as they represent the best version
         verse_feedback = {
-            "first_hemistich": response.first_hemistich,
-            "second_hemistich": response.second_hemistich,
+            "first_hemistich": response["first_hemistich"],
+            "second_hemistich": response["second_hemistich"],
         }
 
         # If we've reached the limit or there's no feedback, approve the verse
-        if state["current_recursion"] >= state["recursion_limit"] or response.feedback is None:
+        if state["current_recursion"] >= state["recursion_limit"] or response.get("feedback") is None:
             return {
                 "reviewer_feedback": verse_feedback,
                 "last_best_verse": verse_feedback,  # Store the best version
@@ -148,7 +160,7 @@ class VerseReviewer(Operation[VerseAnalysisState]):
         else:
             # Need more revisions
             return {
-                "reviewer_feedback": response.feedback,
+                "reviewer_feedback": response.get("feedback"),
                 "last_best_verse": verse_feedback,  # Store the best version
                 "is_approved": False,
                 "current_recursion": state["current_recursion"] + 1,

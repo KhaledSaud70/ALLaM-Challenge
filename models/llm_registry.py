@@ -9,12 +9,8 @@ class LLMRegistry:
     registry = ClassRegistry()
 
     @classmethod
-    def register(cls, name: str):
-        """Decorator to register LLM classes."""
-        def decorator(llm_class: Type[Any]):
-            cls.registry.register(name, llm_class)
-            return llm_class
-        return decorator
+    def register(cls, *args, **kwargs):
+        return cls.registry.register(*args, **kwargs)
 
     @classmethod
     def keys(cls):

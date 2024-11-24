@@ -6,7 +6,7 @@ from .utils import merge_diacritization, print_tool_output
 
 class Diacritizer:
     def __init__(self, weights_path: str = None):
-        self.model = LLMRegistry().get(model_name="diacritizer_model")
+        self.model = LLMRegistry().get(llm_provider="custom", model_name="diacritizer_model")
         self.model.load_model(weights_path=weights_path)
 
     def __call__(self, state: VerseAnalysisState) -> Dict[str, Any]:
@@ -15,7 +15,7 @@ class Diacritizer:
         verse = state["verse"] if isinstance(state, dict) else state.verse
 
         for hemistich_key in ["first_hemistich", "second_hemistich"]:
-            hemistich = verse[hemistich_key] if isinstance(verse, dict) else getattr(verse, hemistich_key)
+            hemistich = verse.get(hemistich_key) if isinstance(verse, dict) else getattr(verse, hemistich_key)
             processed_hemistich = self.model.text_encoder.clean(hemistich).strip()
 
             # Get diacritization

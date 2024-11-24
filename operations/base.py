@@ -68,24 +68,24 @@ class Operation(ABC, BaseModel, Generic[AgentState]):
             # prepare appropriate fake responses
             if self.llm_name == "FakeChatModel":
                 fake_responses = {
-                    "QueryTransform": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
+                    "QueryTransform": lambda: self.llm_registry.get(llm_provider="custom", model_name="FakeChatModel", messages=[json.dumps({
                         "is_valid": True,
                         "transformed_theme": "Fake theme.",
                         "error": None
                     })]),
-                    "PoemGenerator": lambda: self.llm_registry.get(llm_provider="custom", messages=["Fake response"]),
-                    "PoemEvaluator": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
-                        "best_poem": {
-                            "first_hemistich": "Fake first hemistich",
-                            "second_hemistich": "Fake second hemistich",
-                        }
+                    "PoemGenerator": lambda: self.llm_registry.get(llm_provider="custom", model_name="FakeChatModel", messages=["Fake response"]),
+                    "PoemEvaluator": lambda: self.llm_registry.get(llm_provider="custom", model_name=self.llm_name, messages=[json.dumps({
+                        "best_poem": [{
+                            "first_hemistich": "الشطر الاول",
+                            "second_hemistich": "الشطر الثاني",
+                        }]
                     })]),
-                    "VerseReviewer": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
-                        "first_hemistich": "Fake first hemistich",
-                        "second_hemistich": "Fake second hemistich",
+                    "VerseReviewer": lambda: self.llm_registry.get(llm_provider="custom", model_name=self.llm_name, messages=[json.dumps({
+                        "first_hemistich": "الشطر الاول",
+                        "second_hemistich": "الشطر الثاني",
                         "feedback": None,
                     })]),
-                    "VerseReviser": lambda: self.llm_registry.get(llm_provider="custom", messages=["Fake response"]),
+                    "VerseReviser": lambda: self.llm_registry.get(llm_provider="custom", model_name="FakeChatModel", messages=["Fake response"]),
                 }
 
                 if type(self).__name__ in fake_responses:
