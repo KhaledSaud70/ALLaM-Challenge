@@ -67,8 +67,6 @@ class PoemGenerator(Operation[AgentState]):
     def get_messages(self, state: AgentState) -> List[BaseMessage]:
         data = state["user_preferences"]
         prompt_template = PromptTemplateRegistry.get("PoemGenerator")
-
-        # verse_count = verse_mapping.get(data["num_verses"], f"{data['num_verses']} أبيات")
         prompt = prompt_template.format(
             meter=data.get("meter", "غير محدد"),
             rhyme=data.get("rhyme", "غير محدد"),

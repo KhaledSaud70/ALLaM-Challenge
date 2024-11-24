@@ -54,10 +54,8 @@ class Config:
         with open(yaml_path, 'r') as f:
             config_dict = yaml.safe_load(f)
         
-        # Create ModelPaths instance
         model_paths = ModelPaths(**config_dict.get('model_paths', {}))
         
-        # Create operations config
         operations = {}
         for op in ['poem_generator', 'poem_evaluator', 'query_transform', 
                   'verse_reviewer', 'verse_reviser']:

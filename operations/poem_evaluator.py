@@ -77,9 +77,6 @@ class PoemEvaluator(Operation[AgentState]):
         formatted_poems = []
         for i, poem_content in enumerate(poems_list, start=1):
             poem_title = f"القصيدة {arabic_ordinals.get(i, f'رقم {i}')}:"
-            # poem_content = "\n".join(
-            #     f"{verse['first_hemistich']} | {verse['second_hemistich']}" for verse in poem
-            # )
             formatted_poems.append(f"{poem_title}\n{poem_content}")
 
         poems_text = "\n\n".join(formatted_poems)

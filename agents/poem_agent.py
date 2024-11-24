@@ -18,7 +18,6 @@ class PoemGeneratorAgent:
         self.config = config
         self.memory = memory or MemorySaver()
         
-        # Initialize components with configuration
         self.poem_retrieval = PoemRetrieval(
             db_path=str(config.db_path),
             diacritizer_weights_path=str(config.model_paths.diacritizer_weights_path)

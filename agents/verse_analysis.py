@@ -101,7 +101,6 @@ class VerseAnalysis:
         self.memory = memory
         self.as_subgraph = as_subgraph
         
-        # Initialize components with configuration
         self.meter_classifier = MeterClassifier(
             weights_path=str(config.model_paths.meter_weights_path)
         )
@@ -321,26 +320,3 @@ class VerseAnalysis:
 
     def get_graph(self) -> StateGraph:
         return self._create_workflow()
-
-
-if __name__ == "__main__":
-    inputs1 = {
-        "user_preferences": {"rhyme": "د", "meter": "الطويل"},
-        "verse": {"first_hemistich": "إذا عزّ نفس اللئيم بذلها", "second_hemistich": "وَنفس الكريم الحرّ بالمجدِ تُعلَمُ"},
-        "current_recursion": 0,
-        "recursion_limit": 2,
-        "reviewer_feedback": "",
-        "reviser_feedback": "",
-    }
-
-    models_configs = {
-        "meter_weights_path": "/home/khaled/workspace/projects/allam/models/weights/classic_meters_classifierTF_10L12H.h5",
-        "diacritizer_weights_path": "/home/khaled/workspace/projects/allam/models/weights/diacritizer_model_weights.pt",
-    }
-
-    agent = VerseAnalysis(models_configs=models_configs)
-    response = agent.execute(inputs1, thread_id=1)
-
-    print("FINAL STATE:\n")
-    for k, v in response.items():
-        print(f"{k}: {v}")
