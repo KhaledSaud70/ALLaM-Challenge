@@ -123,7 +123,8 @@ class PoemEvaluator(Operation[AgentState]):
 
     def process_response(self, response: str, state: AgentState) -> Dict[str, Any]:
         if self.llm_provider == "custom" and self.llm_name == "FakeChatModel":
-            response = json.loads(response.content)
+            print_operation_output(output=response.content, operation="PoemEvaluator")
+            return {"selected_poem": response.content}
         
-        print_operation_output(output=response.get("best_poem", {}), operation="PoemEvaluator")
-        return {"selected_poem": response.get("best_poem", {})}
+        print_operation_output(output=response.best_poem, operation="PoemEvaluator")
+        return {"selected_poem": response.best_poem}

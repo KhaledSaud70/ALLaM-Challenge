@@ -73,15 +73,16 @@ class QueryTransform(Operation[AgentState]):
 
     def process_response(self, response: ThemeValidator, state: AgentState) -> AgentState:
         if self.llm_provider == "custom" and self.llm_name == "FakeChatModel":
-            response = json.loads(response.content)
+            print_operation_output(output=response.content, operation="QueryTransform")
+            return {"user_preferences": response.content}
 
         print_operation_output(output=response, operation="QueryTransform")
 
-        if not response.get("is_valid"):
+        if not response.is_valid:
             # If the query is invalid, update state with error and return early
             return {"error": {"operation": "QueryTransform", "message": response.error, "status": "failed"}}
 
         preferences = state.get("user_preferences", {})
-        preferences.update({"theme": response.get("transformed_theme")})
+        preferences.update({"theme": response.transformed_theme})
 
         return {"user_preferences": preferences}

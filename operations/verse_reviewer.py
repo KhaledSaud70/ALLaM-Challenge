@@ -83,8 +83,14 @@ class VerseReviewer(Operation[VerseAnalysisState]):
 """
         reference_poem_lines = []
         for verse in state["reference_poem"]:
-            formatted_verse = f"{verse.get('first_hemistich')} | {verse.get('second_hemistich')}"
-            # formatted_verse = f"{verse['first_hemistich']} | {verse['second_hemistich']}"
+            try:
+                formatted_verse = f"{verse.first_hemistich} | {verse.second_hemistich}"
+            except (AttributeError, TypeError):
+                try:
+                    formatted_verse = f"{verse.get('first_hemistich')} | {verse.get('second_hemistich')}"
+                except AttributeError:
+                    formatted_verse = "Unable to format verse - invalid structure"
+                    
             reference_poem_lines.append(formatted_verse)
 
         reference_poem = "\n".join(reference_poem_lines)
@@ -145,12 +151,12 @@ class VerseReviewer(Operation[VerseAnalysisState]):
 
         # Always return the hemistiches as they represent the best version
         verse_feedback = {
-            "first_hemistich": response["first_hemistich"],
-            "second_hemistich": response["second_hemistich"],
+            "first_hemistich": response.first_hemistich,
+            "second_hemistich": response.second_hemistich,
         }
 
         # If we've reached the limit or there's no feedback, approve the verse
-        if state["current_recursion"] >= state["recursion_limit"] or response.get("feedback") is None:
+        if state["current_recursion"] >= state["recursion_limit"] or response.feedback is None:
             return {
                 "reviewer_feedback": verse_feedback,
                 "last_best_verse": verse_feedback,  # Store the best version
@@ -160,7 +166,7 @@ class VerseReviewer(Operation[VerseAnalysisState]):
         else:
             # Need more revisions
             return {
-                "reviewer_feedback": response.get("feedback"),
+                "reviewer_feedback": response.feedback,
                 "last_best_verse": verse_feedback,  # Store the best version
                 "is_approved": False,
                 "current_recursion": state["current_recursion"] + 1,

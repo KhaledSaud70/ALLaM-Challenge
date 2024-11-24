@@ -31,7 +31,7 @@ class LLMRegistry:
             llm_class = cls.registry.get(model_name, **kwargs)
             if llm_class is None:
                 raise ValueError(f"Custom LLM '{model_name}' not found in registry.")
-            return llm_class(**kwargs)
+            return llm_class
         elif llm_provider == "anthropic":
             return ChatAnthropic(model=model_name, **kwargs)
         elif llm_provider == "openai":

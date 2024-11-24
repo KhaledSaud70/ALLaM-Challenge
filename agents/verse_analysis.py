@@ -114,13 +114,13 @@ class VerseAnalysis:
         )
         
         self.verse_reviewer = VerseReviewer(
-            provider=config.operations.verse_reviewer.provider,
+            llm_provider=config.operations.verse_reviewer.provider,
             llm_name=config.operations.verse_reviewer.name,
             llm_params=config.operations.verse_reviewer.params
         )
         
         self.verse_reviser = VerseReviser(
-            provider=config.operations.verse_reviser.provider,
+            llm_provider=config.operations.verse_reviser.provider,
             llm_name=config.operations.verse_reviser.name,
             llm_params=config.operations.verse_reviser.params
         )

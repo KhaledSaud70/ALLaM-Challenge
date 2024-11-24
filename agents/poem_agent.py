@@ -25,19 +25,19 @@ class PoemGeneratorAgent:
         )
         
         self.query_transform = QueryTransform(
-            provider=config.operations.query_transform.provider,
+            llm_provider=config.operations.query_transform.provider,
             llm_name=config.operations.query_transform.name,
             llm_params=config.operations.query_transform.params
         )
         
         self.poem_generator = PoemGenerator(
-            provider=config.operations.poem_generator.provider,
+            llm_provider=config.operations.poem_generator.provider,
             llm_name=config.operations.poem_generator.name,
             llm_params=config.operations.poem_generator.params
         )
         
         self.poem_evaluator = PoemEvaluator(
-            provider=config.operations.poem_evaluator.provider,
+            llm_provider=config.operations.poem_evaluator.provider,
             llm_name=config.operations.poem_evaluator.name,
             llm_params=config.operations.poem_evaluator.params
         )
