@@ -1,9 +1,8 @@
 from typing import Any, Dict, List, Optional, Type
 from class_registry import ClassRegistry
-from langchain.chat_models import ChatAnthropic, ChatOpenAI
-from langchain.schema import AIMessage
-from itertools import cycle
-import os
+from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
+
 
 
 class LLMRegistry:

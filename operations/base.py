@@ -70,12 +70,15 @@ class Operation(ABC, BaseModel, Generic[AgentState]):
                 fake_responses = {
                     "QueryTransform": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
                         "is_valid": True,
-                        "transformed_theme": "Fake theme for debugging",
+                        "transformed_theme": "Fake theme.",
                         "error": None
                     })]),
                     "PoemGenerator": lambda: self.llm_registry.get(llm_provider="custom", messages=["Fake response"]),
                     "PoemEvaluator": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
-                        "best_poem": "Fake poem for debugging"
+                        "best_poem": {
+                            "first_hemistich": "Fake first hemistich",
+                            "second_hemistich": "Fake second hemistich",
+                        }
                     })]),
                     "VerseReviewer": lambda: self.llm_registry.get(llm_provider="custom", messages=[json.dumps({
                         "first_hemistich": "Fake first hemistich",
