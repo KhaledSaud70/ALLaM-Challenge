@@ -152,6 +152,7 @@ Special thanks to our collaborators:
 - SDAIA
 - IBM
 - National Technology Development Program
+- [harbi](https://github.com/harbi) - Project Contributor
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
