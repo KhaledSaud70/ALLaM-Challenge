@@ -4,7 +4,7 @@
 
 # Multi-Agent Arabic Poetry Generator and Analyzer
 
-A state-of-the-art multi-agent system developed during the **ALLaM Challenge** hackathon, leveraging the **LangGraph** framework to create and analyze Arabic poetry using advanced AI agents and Large Language Models (LLMs).
+A state-of-the-art multi-agent system developed during the **ALLaM Challenge** hackathon, leveraging the **LangGraph** framework to create and analyze Arabic poetry.
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/)
